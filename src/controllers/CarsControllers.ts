@@ -3,7 +3,8 @@ import express from 'express'
 
 async function getCars(request: express.Request, response: express.Response) {
   try {
-    const query = await dataCars.allItems()
+    const search = request.query.search
+    const query = await dataCars.getItems(search)
     return response.status(201).json(query)
   } catch {
     response.status(500).send('Internal server Error')
@@ -23,8 +24,8 @@ async function getCarsId(request: express.Request, response: express.Response) {
 async function sendCars(request: express.Request, response: express.Response) {
   try {
     const { marca, modelo, ano } = request.body
-    const query = await dataCars.createItem(marca, modelo, ano)
-    return response.status(201).json(query)
+    await dataCars.createItem(marca, modelo, ano)
+    return response.status(201).send()
   } catch {
     response.status(500).send('Internal server Error')
   }
@@ -37,8 +38,8 @@ async function updateCars(
   try {
     const { id } = request.params
     const { marca, modelo, ano } = request.body
-    const query = await dataCars.updateItem(Number(id), marca, modelo, ano)
-    return response.status(201).json(query)
+    await dataCars.updateItem(Number(id), marca, modelo, ano)
+    return response.status(204).send()
   } catch {
     response.status(500).send('Internal server Error')
   }
@@ -50,8 +51,8 @@ async function deleteCars(
 ) {
   try {
     const { id } = request.params
-    const query = await dataCars.deleteItem(Number(id))
-    response.status(204).json(query)
+    await dataCars.deleteItem(Number(id))
+    response.status(204).send()
   } catch {
     response.status(500).send('Internal server Error')
   }

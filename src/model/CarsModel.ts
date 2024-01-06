@@ -1,8 +1,16 @@
 import connection from '../database/db'
 
-const allItems = async () => {
-  const [query] = await connection.execute('SELECT * FROM cars')
-  return query
+const getItems = async (search?: unknown) => {
+  if (search) {
+    const [query] = await connection.execute(
+      'SELECT * FROM cars WHERE marca = ?',
+      [search],
+    )
+    return query
+  } else {
+    const [query] = await connection.execute('SELECT * FROM cars')
+    return query
+  }
 }
 
 const getItemById = async (id: number) => {
@@ -39,7 +47,7 @@ const deleteItem = async (id: number) => {
 }
 
 export default {
-  allItems,
+  getItems,
   getItemById,
   createItem,
   updateItem,
