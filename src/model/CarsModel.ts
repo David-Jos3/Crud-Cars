@@ -1,6 +1,6 @@
 import connection from '../database/db'
 
-const getItems = async (search?: unknown) => {
+const getItems = async (search?: string) => {
   if (search) {
     const [query] = await connection.execute(
       'SELECT * FROM cars WHERE marca = ?',
@@ -13,7 +13,7 @@ const getItems = async (search?: unknown) => {
   }
 }
 
-const getItemById = async (id: number) => {
+const getItemById = async (id: string) => {
   const [query] = await connection.execute('SELECT * FROM cars WHERE ID=?', [
     id,
   ])

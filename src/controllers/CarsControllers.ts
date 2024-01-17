@@ -1,9 +1,9 @@
 import dataCars from '../model/CarsModel'
-import express from 'express'
+import { Request, Response } from 'express'
 
-async function getCars(request: express.Request, response: express.Response) {
+async function getCars(request: Request, response: Response) {
   try {
-    const search = request.query.search
+    const search = request.query.search as string | undefined
     const query = await dataCars.getItems(search)
     return response.status(201).json(query)
   } catch {
@@ -11,17 +11,17 @@ async function getCars(request: express.Request, response: express.Response) {
   }
 }
 
-async function getCarsId(request: express.Request, response: express.Response) {
+async function getCarsId(request: Request, response: Response) {
   try {
     const { id } = request.params
-    const query = await dataCars.getItemById(Number(id))
+    const query = await dataCars.getItemById(id)
     return response.status(201).json(query)
   } catch {
     response.status(500).send('Internal server Error')
   }
 }
 
-async function sendCars(request: express.Request, response: express.Response) {
+async function sendCars(request: Request, response: Response) {
   try {
     const { marca, modelo, ano } = request.body
     await dataCars.createItem(marca, modelo, ano)
@@ -31,10 +31,7 @@ async function sendCars(request: express.Request, response: express.Response) {
   }
 }
 
-async function updateCars(
-  request: express.Request,
-  response: express.Response,
-) {
+async function updateCars(request: Request, response: Response) {
   try {
     const { id } = request.params
     const { marca, modelo, ano } = request.body
@@ -45,10 +42,7 @@ async function updateCars(
   }
 }
 
-async function deleteCars(
-  request: express.Request,
-  response: express.Response,
-) {
+async function deleteCars(request: Request, response: Response) {
   try {
     const { id } = request.params
     await dataCars.deleteItem(Number(id))
