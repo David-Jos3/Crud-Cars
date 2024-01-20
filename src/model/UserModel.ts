@@ -2,11 +2,11 @@ import { RowDataPacket } from 'mysql2'
 import connection from '../database/db'
 import bcrypt from 'bcrypt'
 
-const createUser = async (
+async function createUserModel(
   username: string,
   email: string,
   password: string,
-) => {
+) {
   const [user] = (await connection.execute(
     'SELECT * FROM user WHERE email = ?',
     [email],
@@ -19,12 +19,11 @@ const createUser = async (
       'INSERT INTO user (username, email, password ) VALUES (?,?,?)',
       [username, email, passwordHash],
     )
-    console.log(username, email)
     return { username, email }
   }
 }
 
-const checkUser = async (email: string, password: string) => {
+async function checkUserModel(email: string, password: string) {
   try {
     const [rows] = (await connection.execute(
       'SELECT * FROM user WHERE email = ?',
@@ -40,4 +39,41 @@ const checkUser = async (email: string, password: string) => {
   }
 }
 
-export default { checkUser, createUser }
+async function updatePasswordModel(
+  userId: number,
+  email: string,
+  password: string,
+) {
+  try {
+    const passwordHash = await bcrypt.hash(password, 10)
+    const [result] = (await connection.execute(
+      'UPDATE user SET password=? WHERE id=?',
+      [passwordHash, userId],
+    )) as RowDataPacket[]
+
+    if (result.affectedRows > 0) {
+      return { userId, email, password }
+    } else {
+      throw new Error('User not found')
+    }
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+async function deleteUserModel(userId: number) {
+  try {
+    await connection.execute('DELETE FROM user WHERE id=?', [userId])
+    return { userId }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export default {
+  checkUserModel,
+  createUserModel,
+  updatePasswordModel,
+  deleteUserModel,
+}
